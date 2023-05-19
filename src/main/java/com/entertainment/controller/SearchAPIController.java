@@ -41,7 +41,6 @@ public class SearchAPIController {
             List<Customer> customers = customerRepository.findByAddressListIn(addresses);
             List<Order> orders = orderRepository.findByCustomerIn(customers);
             return ResponseEntity.ok(orders);
-//            return null;
         }else if(productName!=null){
             List<Order> orders = orderRepository.findByProductName(productName);
             return ResponseEntity.ok(orders);
@@ -64,6 +63,25 @@ public class SearchAPIController {
     @PostMapping(value = "/saveAddress")
     public List<Address> saveAllAddress(@RequestBody List<Address> addressList){
         return addressRepository.saveAll(addressList);
+    }
+
+    @GetMapping(value="/getData")
+    public ResponseEntity<?> findAllData( @RequestParam(required = false) String customerName,
+                                       @RequestParam(required = false) String cityName,
+                                       @RequestParam(required = false) String productName){
+        if(customerName!=null){
+            return new ResponseEntity<>(customerRepository.findByCustomerName(customerName),HttpStatus.OK);
+        }else if(cityName!=null){
+            List<Address> addresses = addressRepository.findByCity(cityName);
+            List<Customer> customers = customerRepository.findByAddressListIn(addresses);
+            return new ResponseEntity<>(customers,HttpStatus.OK);
+        }else if(productName!=null){
+            List<Order> orders = orderRepository.findByProductName(productName);
+            List<Customer> customers = customerRepository.findByOrderListIn(orders);
+            return new ResponseEntity<>(customers,HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(customerRepository.findAll(),HttpStatus.OK);
+        }
     }
 
 }
